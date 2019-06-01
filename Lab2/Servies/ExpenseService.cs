@@ -17,14 +17,20 @@ namespace Lab2.Servies
             this.context = context;
         }
 
-        public IEnumerable<GetExpenseDto> GetAll(DateTime? from = null, DateTime? to = null, TypeEnum? type = null)
+        public PaginatedList<GetExpenseDto> GetAll(int page, DateTime? from = null, DateTime? to = null, TypeEnum? type = null)
         {
-            IQueryable<Expense> result = context.Expenses.Include(expense => expense.Comments);
+            IQueryable<Expense> result = context
+                .Expenses
+                .OrderBy(f => f.Date)
+                .Include(expense => expense.Comments);
 
-            if (from == null && to == null && type == null)
-            {
-                return result.Select(expense => GetExpenseDto.DtoFromModel(expense));
-            }
+            PaginatedList<GetExpenseDto> paginatedResult = new PaginatedList<GetExpenseDto>();
+            paginatedResult.CurrentPage = page;
+
+            //if (from == null && to == null && type == null)
+            //{
+            //    return result.Select(expense => GetExpenseDto.DtoFromModel(expense));
+            //}
 
             if (from != null)
             {
@@ -41,7 +47,13 @@ namespace Lab2.Servies
                 result = result.Where(expense => expense.Type == type);
             }
 
-            return result.Select(expense => GetExpenseDto.DtoFromModel(expense));
+            paginatedResult.NumberOfPages = (result.Count() - 1) / PaginatedList<GetExpenseDto>.EntriesPerPage + 1;
+            result = result
+                .Skip((page - 1) * PaginatedList<GetExpenseDto>.EntriesPerPage)
+                .Take(PaginatedList<GetExpenseDto>.EntriesPerPage);
+            paginatedResult.Entries = result.Select(expense => GetExpenseDto.DtoFromModel(expense)).ToList();
+
+            return paginatedResult;
         }
 
         public Expense GetById(int id)
@@ -51,6 +63,7 @@ namespace Lab2.Servies
 
         public Expense Create(PostExpenseDto expenseDto)
         {
+            // TODO: how to store the user that added the expense as a field in Expense?
             Expense expenseModel = PostExpenseDto.ModelFromDto(expenseDto);
             context.Expenses.Add(expenseModel);
             context.SaveChanges();
@@ -76,7 +89,9 @@ namespace Lab2.Servies
 
         public Expense Delete(int id)
         {
-            var existing = context.Expenses.FirstOrDefault(expense => expense.Id == id);
+            var existing = context.Expenses
+                .Include(ex => ex.Comments)
+                .FirstOrDefault(expense => expense.Id == id);
 
             if (existing == null)
             {

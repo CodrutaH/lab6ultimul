@@ -12,8 +12,19 @@ namespace Lab2.Models
         {
         }
 
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            builder.Entity<User>(entity => {
+                entity.HasIndex(u => u.Username).IsUnique();
+            });
+        }
+
+        // DbSet = Repository
+        // DbSet = O tabela din baza de date
         public DbSet<Expense> Expenses { get; set; }
 
         public DbSet<Comment> Comments { get; set; }
+
+        public DbSet<User> Users { get; set; }
     }
 }

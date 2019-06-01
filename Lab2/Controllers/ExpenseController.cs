@@ -1,6 +1,7 @@
 ﻿using Lab2.DTOs;
 using Lab2.Models;
 using Lab2.Servies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -29,9 +30,10 @@ namespace Lab2.Controllers
         /// <param name="type">Optional, filter by type of expense</param>
         /// <returns>A list of Expense Objects</returns>
         [HttpGet]
-        public IEnumerable<GetExpenseDto> GetAll([FromQuery]DateTime? from, [FromQuery]DateTime? to, [FromQuery]TypeEnum? type)
+        public PaginatedList<GetExpenseDto> GetAll([FromQuery]DateTime? from, [FromQuery]DateTime? to, [FromQuery]TypeEnum? type, [FromQuery]int page = 1)
         {
-            return expenseService.GetAll(from, to, type);
+            page = Math.Max(page, 1);
+            return expenseService.GetAll(page, from, to, type);
         }
 
         /// <summary>
@@ -82,6 +84,7 @@ namespace Lab2.Controllers
         /// <param name="expenseDto">The expense to add.</param>
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Authorize]
         [HttpPost]
         public void Post([FromBody] PostExpenseDto expenseDto)
         {
@@ -96,6 +99,7 @@ namespace Lab2.Controllers
         /// <returns>The updated expense.</returns>
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Authorize]
         [HttpPut("{id}")]
         public IActionResult Put(int id, [FromBody] Expense expense)
         {
@@ -108,7 +112,10 @@ namespace Lab2.Controllers
         /// </summary>
         /// <param name="id">The id of an expense</param>
         /// <returns>The deleted expense.</returns>
+        [Authorize]
         [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult Delete(int id)
         {
             var result = expenseService.Delete(id);
