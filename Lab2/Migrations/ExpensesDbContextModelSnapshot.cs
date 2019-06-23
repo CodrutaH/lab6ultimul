@@ -29,11 +29,15 @@ namespace Lab2.Migrations
 
                     b.Property<bool>("Important");
 
+                    b.Property<int?>("OwnerId");
+
                     b.Property<string>("Text");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ExpenseId");
+
+                    b.HasIndex("OwnerId");
 
                     b.ToTable("Comments");
                 });
@@ -53,11 +57,15 @@ namespace Lab2.Migrations
 
                     b.Property<string>("Location");
 
+                    b.Property<int?>("OwnerId");
+
                     b.Property<int>("Sum");
 
                     b.Property<int>("Type");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("OwnerId");
 
                     b.ToTable("Expenses");
                 });
@@ -67,6 +75,8 @@ namespace Lab2.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("CreatedAt");
 
                     b.Property<string>("Email");
 
@@ -85,11 +95,74 @@ namespace Lab2.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("Lab2.Models.UserRole", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Description");
+
+                    b.Property<string>("Name");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UserRole");
+                });
+
+            modelBuilder.Entity("Lab2.Models.UserUserRole", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime?>("EndTime");
+
+                    b.Property<DateTime>("StartTime");
+
+                    b.Property<int>("UserId");
+
+                    b.Property<int>("UserRoleId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("UserRoleId");
+
+                    b.ToTable("UserUserRoles");
+                });
+
             modelBuilder.Entity("Lab2.Models.Comment", b =>
                 {
-                    b.HasOne("Lab2.Models.Expense")
+                    b.HasOne("Lab2.Models.Expense", "Expense")
                         .WithMany("Comments")
-                        .HasForeignKey("ExpenseId");
+                        .HasForeignKey("ExpenseId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Lab2.Models.User", "Owner")
+                        .WithMany()
+                        .HasForeignKey("OwnerId");
+                });
+
+            modelBuilder.Entity("Lab2.Models.Expense", b =>
+                {
+                    b.HasOne("Lab2.Models.User", "Owner")
+                        .WithMany()
+                        .HasForeignKey("OwnerId");
+                });
+
+            modelBuilder.Entity("Lab2.Models.UserUserRole", b =>
+                {
+                    b.HasOne("Lab2.Models.User", "User")
+                        .WithMany("UserUserRoles")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Lab2.Models.UserRole", "UserRole")
+                        .WithMany("UserUserRoles")
+                        .HasForeignKey("UserRoleId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }

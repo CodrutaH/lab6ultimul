@@ -25,6 +25,7 @@ namespace Lab2
                 {
                     var context = services.GetRequiredService<ExpensesDbContext>();
                     ExpensesDbSeeder.Initialize(context);
+                    RoleDbSeeder.Initialize(context);
                 }
                 catch(Exception e)
                 {

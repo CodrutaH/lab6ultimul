@@ -19,11 +19,14 @@ namespace Lab2.Controllers
         {
             this.commentService = service;
         }
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
 
         [HttpGet]
-        public IEnumerable<GetCommentsDto> GetComments(string text = "")
+        public PaginatedList<GetCommentsDto> GetComments([FromQuery]string filterString, [FromQuery]int page = 1)
         {
-            return commentService.GetComments(text);
+            page = Math.Max(page, 1);
+            return commentService.GetAll(page, filterString);
         }
     }
 }

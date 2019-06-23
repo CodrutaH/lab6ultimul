@@ -8,10 +8,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Lab2.Servies
 {
-    public class ExpenseService : IExpenseService
+    public class ExpenseService : IExpenseInterface
     {
         private ExpensesDbContext context;
-
+    
         public ExpenseService(ExpensesDbContext context)
         {
             this.context = context;
@@ -21,11 +21,12 @@ namespace Lab2.Servies
         {
             IQueryable<Expense> result = context
                 .Expenses
-                .OrderBy(f => f.Date)
+                .OrderBy(expense => expense.Date)
                 .Include(expense => expense.Comments);
 
             PaginatedList<GetExpenseDto> paginatedResult = new PaginatedList<GetExpenseDto>();
             paginatedResult.CurrentPage = page;
+
 
             //if (from == null && to == null && type == null)
             //{
@@ -47,11 +48,11 @@ namespace Lab2.Servies
                 result = result.Where(expense => expense.Type == type);
             }
 
-            paginatedResult.NumberOfPages = (result.Count() - 1) / PaginatedList<GetExpenseDto>.EntriesPerPage + 1;
+            paginatedResult.NumberOfPages = ((result.Count() - 1) / PaginatedList<GetExpenseDto>.EntriesPerPage) + 1;
             result = result
                 .Skip((page - 1) * PaginatedList<GetExpenseDto>.EntriesPerPage)
                 .Take(PaginatedList<GetExpenseDto>.EntriesPerPage);
-            paginatedResult.Entries = result.Select(expense => GetExpenseDto.DtoFromModel(expense)).ToList();
+            paginatedResult.Entries = result.Select(expense => GetExpenseDto.ModelFromDto(expense)).ToList();
 
             return paginatedResult;
         }
@@ -61,13 +62,14 @@ namespace Lab2.Servies
             return context.Expenses.Include(ex => ex.Comments).FirstOrDefault(ex => ex.Id == id);
         }
 
-        public Expense Create(PostExpenseDto expenseDto)
+        public Expense Create(PostExpenseDto expenseDto, User addedBy)
         {
             // TODO: how to store the user that added the expense as a field in Expense?
-            Expense expenseModel = PostExpenseDto.ModelFromDto(expenseDto);
-            context.Expenses.Add(expenseModel);
+            Expense toAdd = PostExpenseDto.ModelFromDto(expenseDto);
+            toAdd.Owner = addedBy;
+            context.Expenses.Add(toAdd);
             context.SaveChanges();
-            return expenseModel;
+            return toAdd;
         }
 
         public Expense Upsert(int id, Expense expense)
@@ -102,6 +104,7 @@ namespace Lab2.Servies
             context.SaveChanges();
             return existing;
         }
+
         
     }
 }

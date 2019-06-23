@@ -7,6 +7,10 @@ namespace Lab2.Models
 {
     public enum TypeEnum
     {
-        Food, Utilities, Transportation, Outing, Groceries, Clothes, Electronics, Other
+        Food, Utilities, Transportation, Outing, Groceries, Clothes, Electronics, Other,
+   
+        Regular,
+        User_Manager,
+        Admin,
     }
 }

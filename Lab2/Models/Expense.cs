@@ -21,6 +21,9 @@ namespace Lab2.Models
 
         [Required]
         public DateTime Date { get; set; }
+       // public DateTime? Added { get; set; }
+        //public DateTime? Deadline { get; set; }
+       // public DateTime? ClosedAt { get; set; }
 
         public string Currency { get; set; }
 
@@ -29,5 +32,6 @@ namespace Lab2.Models
         public TypeEnum Type { get; set; }
 
         public List<Comment> Comments { get; set; }
+        public User Owner { get; set; }
     }
 }

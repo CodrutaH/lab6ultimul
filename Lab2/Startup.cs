@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Lab2.Models;
 using Lab2.Servies;
+using Lab2.Validators;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -99,9 +100,11 @@ namespace Lab2
 
             // https://stackoverflow.com/questions/38138100/addtransient-addscoped-and-addsingleton-services-differences
             // Dependency Injection
-            services.AddScoped<IExpenseService, ExpenseService>();
+            services.AddScoped<IExpenseInterface, ExpenseService>();
             services.AddScoped<ICommentService, CommentsService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IUserRoleService, UserRoleService>();
+            services.AddScoped<IRegisterValidator, RegisterValidator>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

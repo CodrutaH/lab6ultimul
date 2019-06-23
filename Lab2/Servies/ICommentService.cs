@@ -8,6 +8,6 @@ namespace Lab2.Servies
 {
     public interface ICommentService
     {
-        IEnumerable<GetCommentsDto> GetComments(string text = "");
+        PaginatedList<GetCommentsDto> GetAll(int page, string filterString);
     }
 }

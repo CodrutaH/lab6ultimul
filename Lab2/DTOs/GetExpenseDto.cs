@@ -20,7 +20,7 @@ namespace Lab2.DTOs
 
         public int NumberOfComments { get; set; }
 
-        public static GetExpenseDto DtoFromModel(Expense expense)
+        public static GetExpenseDto ModelFromDto(Expense expense)
         {
             return new GetExpenseDto
             {

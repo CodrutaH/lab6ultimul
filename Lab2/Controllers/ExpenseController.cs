@@ -16,11 +16,13 @@ namespace Lab2.Controllers
     [ApiController]
     public class ExpenseController : ControllerBase
     {
-        private IExpenseService expenseService;
+        private IExpenseInterface expenseService;
+        private  IUserService userService;
 
-        public ExpenseController(IExpenseService service)
+        public ExpenseController(IExpenseInterface service, IUserService userService)
         {
             this.expenseService = service;
+            this.userService = userService;
         }
         /// <summary>
         /// Gets all the expenses.
@@ -28,7 +30,11 @@ namespace Lab2.Controllers
         /// <param name="from">Optional, filter by start date</param>
         /// <param name="to">Optional, filter by end date</param>
         /// <param name="type">Optional, filter by type of expense</param>
+        /// <param name="page">Optional, filter by page </param>
         /// <returns>A list of Expense Objects</returns>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+
         [HttpGet]
         public PaginatedList<GetExpenseDto> GetAll([FromQuery]DateTime? from, [FromQuery]DateTime? to, [FromQuery]TypeEnum? type, [FromQuery]int page = 1)
         {
@@ -41,6 +47,10 @@ namespace Lab2.Controllers
         /// </summary>
         /// <param name="id">Get expense by id</param>
         /// <returns>An Expense Object</returns>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Authorize(Roles = "Regular, Admin")]
+
         [HttpGet("{id}")]
         public IActionResult GetExpense(int id)
         {
@@ -53,6 +63,7 @@ namespace Lab2.Controllers
 
             return Ok(existing);
         }
+       
 
         /// <summary>
         /// Add an expense.
@@ -84,11 +95,13 @@ namespace Lab2.Controllers
         /// <param name="expenseDto">The expense to add.</param>
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [Authorize]
+        [Authorize(Roles = "Admin,Regular")]
         [HttpPost]
         public void Post([FromBody] PostExpenseDto expenseDto)
         {
-            expenseService.Create(expenseDto);
+
+            User addedBy = userService.GetCurrentUser(HttpContext);
+            expenseService.Create(expenseDto, addedBy);
         }
 
         /// <summary>
@@ -99,7 +112,7 @@ namespace Lab2.Controllers
         /// <returns>The updated expense.</returns>
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [Authorize]
+        [Authorize(Roles = "Admin,Regular")]
         [HttpPut("{id}")]
         public IActionResult Put(int id, [FromBody] Expense expense)
         {
@@ -112,7 +125,7 @@ namespace Lab2.Controllers
         /// </summary>
         /// <param name="id">The id of an expense</param>
         /// <returns>The deleted expense.</returns>
-        [Authorize]
+        [Authorize(Roles = "Admin,Regular")]
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

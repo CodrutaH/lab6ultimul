@@ -7,14 +7,13 @@ using System.Threading.Tasks;
 
 namespace Lab2.Servies
 {
-    public interface IExpenseService
+    public interface IExpenseInterface
     {
         PaginatedList<GetExpenseDto> GetAll(int page, DateTime? from = null, DateTime? to = null, TypeEnum? type = null);
 
         Expense GetById(int id);
 
-        Expense Create(PostExpenseDto expenseDto);
-
+        Expense Create(PostExpenseDto expenseDto, User addedBy);
         Expense Upsert(int id, Expense expense);
 
         Expense Delete(int id);

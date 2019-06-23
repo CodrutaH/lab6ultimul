@@ -44,7 +44,7 @@ namespace Lab2.Migrations
 
                     b.Property<string>("Currency");
 
-                    b.Property<DateTime>("Date");
+                    b.Property<System.DateTime>("Date");
 
                     b.Property<string>("Description")
                         .IsRequired();

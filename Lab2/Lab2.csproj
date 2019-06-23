@@ -10,6 +10,8 @@
   <ItemGroup>
     <Compile Remove="Migrations\20190530132240_AddUserAndRegistrationModels.cs" />
     <Compile Remove="Migrations\20190530132240_AddUserAndRegistrationModels.Designer.cs" />
+    <Compile Remove="Migrations\20190604191618_AddTotal.cs" />
+    <Compile Remove="Migrations\20190604191618_AddTotal.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
