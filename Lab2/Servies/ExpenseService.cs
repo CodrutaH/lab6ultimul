@@ -57,6 +57,11 @@ namespace Lab2.Servies
             return paginatedResult;
         }
 
+        public void Create(object expense, User user)
+        {
+            throw new NotImplementedException();
+        }
+
         public Expense GetById(int id)
         {
             return context.Expenses.Include(ex => ex.Comments).FirstOrDefault(ex => ex.Id == id);

@@ -23,31 +23,33 @@ namespace Lab2.Servies
             throw new NotImplementedException();
         }
 
-        // public PaginatedList<GetCommentsDto> GetAll(int page, string filterString)
-        // {
-        //     throw new NotImplementedException();
-        // }
+        public PaginatedList<GetCommentsDto> GetAll(string empty)
+        {
+            throw new NotImplementedException();
+        }
 
-        //public IEnumerable<GetCommentsDto> GetComments(string text)
-        //{
-        //    IQueryable<GetCommentsDto> result = context.Comments.Select(x => new Comment
-        //    {
-        //        Id = x.Id,
-        //        Text = x.Text,
-        //        Important = x.Important,
-        //        ExpenseId = (from Expense in context.Expenses
-        //                     where Expense.Id == x.ExpenseId
-        //                     select Expense.Id).FirstOrDefault()
-        //    });
-        //    //var result = context.Comments.Select(x 
 
-        //    if (text != null)
-        //    {
-        //        result = result.Where(comment => comment.Text.Contains(text));
-        //    }
 
-        //    return result.Select(comment => GetCommentsDto.DtoFromModel(comment));
-        //}
+        public IEnumerable<GetCommentsDto> GetComments(string text)
+        {
+            IQueryable<Comment> result = context.Comments.Select(x => new Comment
+            {
+                Id = x.Id,
+                Text = x.Text,
+                Important = x.Important,
+                Expense = (from Expense in context.Expenses
+                            where Expense.Id == x.Expense.Id
+                             select Expense).FirstOrDefault()
+            });
+            //var result = context.Comments.Select(x 
+
+            if (text != null)
+            {
+                result = result.Where(comment => comment.Text.Contains(text));
+            }
+
+            return result.Select(comment => GetCommentsDto.DtoFromModel(comment));
+        }
 
         public PaginatedList<GetCommentsDto> GetComments(int page, string filterString)
         {
@@ -83,5 +85,18 @@ namespace Lab2.Servies
 
             return paginatedResult;
         }
+
+        
+
+        public Comment Create(CommentPostDto commentDto)
+        {
+            Comment toAdd = CommentPostDto.ToComment(commentDto);
+
+            context.Comments.Add(toAdd);
+            context.SaveChanges();
+            return toAdd;
+
+        }
+
     }
 }

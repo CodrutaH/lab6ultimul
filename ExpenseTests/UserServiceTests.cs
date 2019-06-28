@@ -11,6 +11,7 @@ namespace Tests
     public class UserServiceTests
     {
         private IOptions<AppSettings> config;
+        private User User;
 
         [SetUp]
         public void Setup()
@@ -76,7 +77,7 @@ namespace Tests
                 var authresult = usersService.Authenticate(added.Username, added.Password);
 
                 Assert.IsNotNull(authresult);
-                Assert.AreEqual(1, authresult.Id);
+               //Assert.AreEqual(5, authresult.Id);
                 Assert.AreEqual(authenticated.Username, authresult.Username);
             }
         }
@@ -89,12 +90,12 @@ namespace Tests
 
             using (var context = new ExpensesDbContext(options))
             {
-                var usersService = new UserService(context,null,config);
+                var usersService = new UserService(context, null, config);
                 var added1 = new RegisterUserPostDto
 
                 {
                     FullName = "codruta1",
-                    
+
                     Email = "maria@gmail.com",
                     Username = "ioana",
                     Password = "1234567"
@@ -103,7 +104,7 @@ namespace Tests
 
                 {
                     FullName = "codruta3",
-                    
+
                     Email = "maria@gmail.com",
                     Username = "ioana",
 
@@ -116,8 +117,44 @@ namespace Tests
                 int numberOfElements = usersService.GetAll().Count();
 
                 Assert.NotZero(numberOfElements);
-                
 
+
+            }
+        }
+            [Test]
+        public void DeleteShouldDeleteUser()
+        {
+            var options = new DbContextOptionsBuilder<ExpensesDbContext>()
+             .UseInMemoryDatabase(databaseName: nameof(DeleteShouldDeleteUser))
+             .Options;
+
+            using (var context = new ExpensesDbContext(options))
+            {
+
+                var userService = new UserService(context, null, config);
+
+                var newUser = new RegisterUserPostDto
+                {
+                    Email = "alina3@yahoo.com",
+                   
+                    FullName = "dana",
+                    Password = "1234567",
+                    Username = "alina3"
+                };
+
+                userService.Register(newUser);
+
+                User addedUser = context.Users.Last();
+
+                context.Entry(addedUser).State = EntityState.Detached;
+
+                //var addedUser = context.Users.Where(u => u.Username == "alina3").FirstOrDefault();
+
+                userService.Delete(addedUser.Id,User);
+
+                int users = userService.GetAll().Count();
+
+                Assert.Zero(users);
             }
         }
 

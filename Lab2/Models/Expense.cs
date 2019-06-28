@@ -33,5 +33,7 @@ namespace Lab2.Models
 
         public List<Comment> Comments { get; set; }
         public User Owner { get; set; }
+
+        
     }
 }
